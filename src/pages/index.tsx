@@ -5,6 +5,7 @@ import { StackedImages } from "../components/common/stackImage";
 import { ErrorSection } from "../components/common/error";
 import { SubmitSection } from "../components/common/submit";
 import styles from "../styles/Home.module.css";
+import { ProvinceSelect } from "../components/provinceSelect";
 import { isInAppBrowser } from "../Browser";
 
 const Home = () => {
@@ -26,7 +27,6 @@ const Home = () => {
         <div style={{ height: "30px" }} />
         <h1 className={styles.title}>สแกนตรวจโรคใบอ้อย</h1>
         <div style={{ height: "40px" }} />
-
         {isInAppBrowser() && !hook.finalProvince && (
           <div
             style={{
@@ -71,7 +71,6 @@ const Home = () => {
             </button>
           </div>
         )}
-
         <div className={styles.card}>
           <LocationWidget
             province={hook.finalProvince || undefined}
@@ -86,53 +85,72 @@ const Home = () => {
             rainfall={hook.preFetchedWeather?.rain}
           />
         </div>
-
         {hook.isManualMode && (
-          <div className={styles.card} style={{ marginTop: "12px" }}>
-            <select
-              value={hook.selectedProvince || ""}
-              onChange={(e) => hook.setSelectedProvince(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "12px",
-                border: "1px solid #ddd",
-                fontSize: "16px",
-                backgroundColor: "#fff",
-              }}
-            >
-              <option value="">— เลือกจังหวัด —</option>
-              {hook.provinces?.map((prov) => (
-                <option key={prov} value={prov}>
-                  {prov}
-                </option>
-              ))}
-            </select>
+          <div
+            className={styles.card}
+            style={{
+              marginTop: "12px",
+              padding: "16px",
+              display: "flex",
+              alignItems: "flex-end",
+              gap: "12px",
+              flexWrap: "wrap",
+            }}
+          >
+            <div style={{ flex: 1, minWidth: "200px" }}>
+              <ProvinceSelect
+                value={hook.selectedProvince}
+                onChange={hook.setSelectedProvince}
+                isLoading={!hook.provinces}
+              />
+            </div>
 
-            <div style={{ textAlign: "center", margin: "20px 0" }}>
+            <div style={{ flexShrink: 0 }}>
               <button
                 onClick={() => {
                   hook.setIsManualMode(false);
                   hook.getCurrentLocation();
                 }}
+                disabled={hook.isGettingLocation}
                 style={{
-                  background: "#4CAF50",
+                  background: hook.isGettingLocation ? "#ccc" : "#4CAF50",
                   color: "white",
                   border: "none",
-                  padding: "12px 24px",
+                  padding: "10px 16px",
                   borderRadius: "12px",
-                  fontSize: "16px",
+                  fontSize: "15px",
                   fontWeight: "bold",
-                  cursor: "pointer",
+                  cursor: hook.isGettingLocation ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  whiteSpace: "nowrap",
+                  minWidth: "140px",
+                  justifyContent: "center",
+                  height: "44px",
                 }}
               >
-                ใช้ตำแหน่งอัตโนมัติ
+                {hook.isGettingLocation ? (
+                  <>
+                    <div
+                      style={{
+                        width: "14px",
+                        height: "14px",
+                        border: "2px solid #fff",
+                        borderTop: "2px solid transparent",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite",
+                      }}
+                    />
+                    กำลังค้นหา...
+                  </>
+                ) : (
+                  <div>ใช้ตำแหน่ง</div>
+                )}
               </button>
-              <div style={{ height: "8px" }} />
             </div>
           </div>
         )}
-
         <div style={{ height: "20px" }} />
         <ImagePickerWidget
           imageFile={hook.imageFile}
