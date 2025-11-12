@@ -67,7 +67,7 @@ export const ProvinceSelect = ({
   return (
     <div>
       <div style={{ marginBottom: "6px", fontSize: "14px", color: "#555" }}>
-        เลือกจังหวัด
+        เลือกจังหวัด หรือ ใช้ตำแหน่ง GPS
       </div>
       <Select
         value={selectedOption}

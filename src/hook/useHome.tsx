@@ -59,7 +59,9 @@ export const useHome = () => {
 
   useEffect(() => {
     if (isManualMode && selectedProvince) {
-      // ดึง lat/lon จาก API จริง
+      setGeneralError(null);
+      setLocationPermissionDenied(false);
+
       getCoordsFromProvince(selectedProvince).then((coords) => {
         if (coords) {
           setLat(coords.lat);
@@ -68,7 +70,6 @@ export const useHome = () => {
       });
     }
   }, [isManualMode, selectedProvince]);
-
   useEffect(() => {
     if (weatherData) {
       setCurrentProvince(weatherData.province);
@@ -83,8 +84,14 @@ export const useHome = () => {
   useEffect(() => {
     if (weatherError) {
       setGeneralError("ไม่สามารถดึงข้อมูลสภาพอากาศได้");
+    } else if (
+      isManualMode &&
+      selectedProvince &&
+      generalError === "กรุณาเลือกจังหวัด"
+    ) {
+      setGeneralError(null);
     }
-  }, [weatherError]);
+  }, [weatherError, isManualMode, selectedProvince, generalError]);
 
   const getCurrentLocation = async () => {
     setIsGettingLocation(true);
@@ -229,6 +236,7 @@ export const useHome = () => {
     isGettingLocation,
     locationPermissionDenied,
     preFetchedWeather,
+    showLocationRetry: !isManualMode && locationPermissionDenied,
     provinces,
     // เพิ่มคืน
     isManualMode,

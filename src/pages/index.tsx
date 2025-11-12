@@ -111,6 +111,7 @@ const Home = () => {
                   hook.setIsManualMode(false);
                   hook.getCurrentLocation();
                 }}
+                title="ใช้ GPS หาจังหวัดให้อัตโนมัติ"
                 disabled={hook.isGettingLocation}
                 style={{
                   background: hook.isGettingLocation ? "#ccc" : "#4CAF50",
@@ -145,7 +146,7 @@ const Home = () => {
                     กำลังค้นหา...
                   </>
                 ) : (
-                  <div>ใช้ตำแหน่ง</div>
+                  <div>ใช้ตำแหน่ง GPS</div>
                 )}
               </button>
             </div>
@@ -185,6 +186,7 @@ const Home = () => {
         <ErrorSection
           error={hook.generalError}
           onRetry={hook.getCurrentLocation}
+          showRetry={hook.showLocationRetry}
         />
       </div>
     </div>
