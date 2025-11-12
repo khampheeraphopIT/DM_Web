@@ -1,22 +1,16 @@
-import React from "react";
+import CameraSvg from "../../../../public/assets/svg/camera";
+import AlbumSvg from "../../../../public/assets/svg/album";
+import { ImagePickerWidgetProps } from "../../../type/imagePicker";
 
-interface ImagePickerWidgetProps {
-  imageFile: File | null;
-  onCameraPressed: () => void;
-  onGalleryPressed: () => void;
-  errorText?: string;
-  isProcessing: boolean;
-  progress: number;
-}
-
-const ImagePickerWidget: React.FC<ImagePickerWidgetProps> = ({
-  imageFile,
-  onCameraPressed,
-  onGalleryPressed,
-  errorText,
-  isProcessing,
-  progress,
-}) => {
+const ImagePickerWidget = (props: ImagePickerWidgetProps) => {
+  const {
+    imageFile,
+    onCameraPressed,
+    onGalleryPressed,
+    errorText,
+    isProcessing,
+    progress,
+  } = props;
   return (
     <div
       style={{
@@ -50,7 +44,10 @@ const ImagePickerWidget: React.FC<ImagePickerWidgetProps> = ({
             gap: "8px",
           }}
         >
-          <span style={{ fontSize: "22px" }}>📷</span> ถ่ายภาพ
+          <span style={{ fontSize: "22px", marginTop: "5px" }}>
+            <CameraSvg color="#ffffff" />
+          </span>
+          ถ่ายภาพ
         </button>
         <button
           onClick={onGalleryPressed}
@@ -71,7 +68,10 @@ const ImagePickerWidget: React.FC<ImagePickerWidgetProps> = ({
             gap: "8px",
           }}
         >
-          <span style={{ fontSize: "22px" }}>🖼️</span> เลือกจากคลัง
+          <span style={{ fontSize: "22px", marginTop: "5px" }}>
+            <AlbumSvg color="#ffffff" />
+          </span>
+          เลือกจากคลัง
         </button>
       </div>
       {imageFile && (

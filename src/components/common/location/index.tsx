@@ -1,22 +1,12 @@
-import React from "react";
+import { LocationWidgetProps } from "../../../type/location";
+import LocationSvg from "../../../../public/assets/svg/location";
+import TemperatureSvg from "../../../../public/assets/svg/temperature";
+import HumiditySvg from "../../../../public/assets/svg/้humidity";
+import RainfallSvg from "../../../../public/assets/svg/rainfall";
 
-interface LocationWidgetProps {
-  province?: string;
-  isLoading: boolean;
-  errorText?: string;
-  temperature?: string;
-  humidity?: string;
-  rainfall?: string;
-}
-
-const LocationWidget: React.FC<LocationWidgetProps> = ({
-  province,
-  isLoading,
-  errorText,
-  temperature,
-  humidity,
-  rainfall,
-}) => {
+const LocationWidget = (props: LocationWidgetProps) => {
+  const { province, isLoading, errorText, temperature, humidity, rainfall } =
+    props;
   return (
     <div
       style={{
@@ -24,11 +14,12 @@ const LocationWidget: React.FC<LocationWidgetProps> = ({
         borderRadius: "20px",
         padding: "20px",
         backgroundColor: "#FFFFFF",
-        width: "100%",
       }}
     >
       <div style={{ display: "flex", alignItems: "center" }}>
-        <span style={{ fontSize: "24px", color: "#4CAF50" }}>📍</span>
+        <span style={{ fontSize: "24px", color: "#4CAF50", marginTop: "2px" }}>
+          <LocationSvg color="#2dba1e" />
+        </span>
         <div style={{ width: "8px" }} />
         <span style={{ fontSize: "16px", fontWeight: "bold" }}>
           ตำแหน่งปัจจุบัน
@@ -58,8 +49,15 @@ const LocationWidget: React.FC<LocationWidgetProps> = ({
           <div style={{ height: "8px" }} />
           {temperature && humidity && rainfall && (
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <span style={{ fontSize: "24px", color: "#F44336" }}>🌡️</span>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <span style={{ fontSize: "24px", color: "#F44336" }}>
+                  <TemperatureSvg color="red" />
+                </span>
                 <div style={{ width: "8px" }} />
                 <span style={{ fontSize: "16px" }}>
                   อุณหภูมิ: {temperature} °C
@@ -67,13 +65,17 @@ const LocationWidget: React.FC<LocationWidgetProps> = ({
               </div>
               <div style={{ height: "4px" }} />
               <div style={{ display: "flex", alignItems: "center" }}>
-                <span style={{ fontSize: "24px", color: "#2196F3" }}>💧</span>
+                <span style={{ fontSize: "24px", color: "#2196F3" }}>
+                  <HumiditySvg color="#2196F3" />
+                </span>
                 <div style={{ width: "8px" }} />
                 <span style={{ fontSize: "16px" }}>ความชื้น: {humidity} %</span>
               </div>
               <div style={{ height: "4px" }} />
               <div style={{ display: "flex", alignItems: "center" }}>
-                <span style={{ fontSize: "24px", color: "#3F51B5" }}>☁️</span>
+                <span style={{ fontSize: "24px", color: "#ccc" }}>
+                  <RainfallSvg color="#2196F3" />
+                </span>
                 <div style={{ width: "8px" }} />
                 <span style={{ fontSize: "16px" }}>
                   ปริมาณฝน: {rainfall} mm
