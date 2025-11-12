@@ -14,7 +14,6 @@ const useHome = () => {
 
   // === State ===
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [originalImageFile, setOriginalImageFile] = useState<File | null>(null);
   const [resizedImageFile, setResizedImageFile] = useState<File | null>(null);
   const [result, setResult] = useState<PredictionResult | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -120,7 +119,6 @@ const useHome = () => {
   const pickImage = async (_fromCamera: boolean, file: File) => {
     try {
       const files = await ImageService.preprocessImage(file);
-      setOriginalImageFile(files.original);
       setResizedImageFile(files.resized);
       setImageFile(files.original);
       setFileError(null);
