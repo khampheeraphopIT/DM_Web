@@ -86,13 +86,6 @@ export const useHome = () => {
     }
   }, [weatherError]);
 
-  // === Functions ===
-  const showError = (msg: string, showSettings = false) => {
-    alert(msg);
-    if (showSettings)
-      alert("ไปที่การตั้งค่าเบราว์เซอร์ > ความเป็นส่วนตัว > ตำแหน่ง");
-  };
-
   const getCurrentLocation = async () => {
     setIsGettingLocation(true);
     setIsLoading(true);
