@@ -4,7 +4,6 @@ import LocationWidget from "../components/common/location";
 import { StackedImages } from "../components/common/stackImage";
 import { ErrorSection } from "../components/common/error";
 import { SubmitSection } from "../components/common/submit";
-
 import styles from "../styles/Home.module.css";
 import { isInAppBrowser } from "../Browser";
 
@@ -28,7 +27,7 @@ const Home = () => {
         <h1 className={styles.title}>สแกนตรวจโรคใบอ้อย</h1>
         <div style={{ height: "40px" }} />
 
-        {isInAppBrowser() && !hook.currentProvince && (
+        {isInAppBrowser() && !hook.finalProvince && (
           <div
             style={{
               background: "#fffbe6",
@@ -75,7 +74,7 @@ const Home = () => {
 
         <div className={styles.card}>
           <LocationWidget
-            province={hook.currentProvince || undefined}
+            province={hook.finalProvince || undefined}
             isLoading={hook.isGettingLocation}
             errorText={
               hook.locationPermissionDenied
@@ -88,8 +87,53 @@ const Home = () => {
           />
         </div>
 
-        <div style={{ height: "20px" }} />
+        {hook.isManualMode && (
+          <div className={styles.card} style={{ marginTop: "12px" }}>
+            <select
+              value={hook.selectedProvince || ""}
+              onChange={(e) => hook.setSelectedProvince(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: "12px",
+                border: "1px solid #ddd",
+                fontSize: "16px",
+                backgroundColor: "#fff",
+              }}
+            >
+              <option value="">— เลือกจังหวัด —</option>
+              {hook.provinces?.map((prov) => (
+                <option key={prov} value={prov}>
+                  {prov}
+                </option>
+              ))}
+            </select>
 
+            <div style={{ textAlign: "center", margin: "20px 0" }}>
+              <button
+                onClick={() => {
+                  hook.setIsManualMode(false);
+                  hook.getCurrentLocation();
+                }}
+                style={{
+                  background: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  padding: "12px 24px",
+                  borderRadius: "12px",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                ใช้ตำแหน่งอัตโนมัติ
+              </button>
+              <div style={{ height: "8px" }} />
+            </div>
+          </div>
+        )}
+
+        <div style={{ height: "20px" }} />
         <ImagePickerWidget
           imageFile={hook.imageFile}
           onCameraPressed={hook.onCameraPressed}
@@ -98,7 +142,6 @@ const Home = () => {
           isProcessing={hook.isSubmitting}
           progress={hook.uploadProgress}
         />
-
         <input
           type="file"
           accept="image/*"
@@ -114,7 +157,6 @@ const Home = () => {
           style={{ display: "none" }}
           onChange={(e) => hook.handleFileChange(e, false)}
         />
-
         <div style={{ height: "30px" }} />
         <SubmitSection
           result={hook.result}

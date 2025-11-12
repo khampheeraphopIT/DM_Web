@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { useState, useEffect, useRef } from "react";
 import type { PredictionResult } from "../type/predictionResults";
 import { useProvincesQuery } from "../queries/api";
 import { useWeatherAndProvince } from "../queries/weather";
 import { usePredictDiseaseMutation } from "../queries/predict";
-import { usePreprocessImage } from "../queries/image"; // เพิ่ม
+import { usePreprocessImage } from "../queries/image";
+import { getCoordsFromProvince } from "../services/getCoordsFromProvince";
 
 export const useHome = () => {
   // === React Query Hooks ===
   const { data: provinces } = useProvincesQuery();
   const predictMutation = usePredictDiseaseMutation();
   const preprocessMutation = usePreprocessImage();
+
   // === ใช้ weatherQuery กับ lat/lon จริง ===
   const [lat, setLat] = useState<number | undefined>();
   const [lon, setLon] = useState<number | undefined>();
@@ -31,7 +32,6 @@ export const useHome = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [uploadProgress, setUploadProgress] = useState(0.0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [currentProvince, setCurrentProvince] = useState<string | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [locationPermissionDenied, setLocationPermissionDenied] =
@@ -41,17 +41,33 @@ export const useHome = () => {
     string
   > | null>(null);
 
+  // === เพิ่ม state สำหรับเลือกจังหวัดด้วยมือ ===
+  const [isManualMode, setIsManualMode] = useState(true); // เริ่มจากเลือกเอง
+  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
+
   const progressTimer = useRef<NodeJS.Timeout | null>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
   // === Effects ===
+  // useEffect(() => {
+  //   getCurrentLocation();  // ลบออก!
+  //   return () => {
+  //     if (progressTimer.current) clearInterval(progressTimer.current);
+  //   };
+  // }, []);
+
   useEffect(() => {
-    getCurrentLocation();
-    return () => {
-      if (progressTimer.current) clearInterval(progressTimer.current);
-    };
-  }, []);
+    if (isManualMode && selectedProvince) {
+      // ดึง lat/lon จาก API จริง
+      getCoordsFromProvince(selectedProvince).then((coords) => {
+        if (coords) {
+          setLat(coords.lat);
+          setLon(coords.lon);
+        }
+      });
+    }
+  }, [isManualMode, selectedProvince]);
 
   useEffect(() => {
     if (weatherData) {
@@ -85,7 +101,6 @@ export const useHome = () => {
 
     try {
       if (!navigator.geolocation) throw new Error("เบราว์เซอร์ไม่รองรับ");
-
       const position = await new Promise<GeolocationPosition>(
         (resolve, reject) => {
           navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -95,23 +110,20 @@ export const useHome = () => {
           });
         }
       );
-
-      // ตั้งค่า lat/lon เพื่อให้ useWeatherAndProvince ทำงาน
       setLat(position.coords.latitude);
       setLon(position.coords.longitude);
+      setIsManualMode(false);
     } catch (error: any) {
       let msg = "";
       if (error.code === 1) {
-        msg = "กรุณาอนุญาตตำแหน่งเพื่อใช้งานเว็บ";
+        msg = "คุณปฏิเสธการแชร์ตำแหน่ง";
         setLocationPermissionDenied(true);
-        showError(msg, true);
-      } else if (error.code === 2) msg = "ไม่สามารถดึงตำแหน่งได้ ลองอีกครั้ง";
-      else if (error.code === 3)
-        msg = "ดึงตำแหน่งช้าเกินไป\nกรุณาเปิด GPS และลองอีกครั้ง";
-      else msg = `เกิดข้อผิดพลาด: ${error.message || error}`;
+      } else if (error.code === 2) msg = "ไม่สามารถดึงตำแหน่งได้";
+      else if (error.code === 3) msg = "ดึงตำแหน่งช้าเกินไป";
+      else msg = `เกิดข้อผิดพลาด: ${error.message}`;
 
-      showError(msg);
       setGeneralError(msg);
+      setIsManualMode(true);
     } finally {
       setIsGettingLocation(false);
       setIsLoading(false);
@@ -138,14 +150,12 @@ export const useHome = () => {
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const ext = file.name.split(".").pop()?.toLowerCase();
     const allowed = ["jpg", "jpeg", "png", "gif", "bmp", "webp"];
     if (!allowed.includes(ext || "")) {
       setFileError("รองรับเฉพาะไฟล์ภาพ: JPG, PNG, GIF, BMP, WEBP");
       return;
     }
-
     pickImage(file);
     e.target.value = "";
   };
@@ -170,11 +180,17 @@ export const useHome = () => {
     setIsSubmitting(true);
     setUploadProgress(0);
 
-    if (!currentProvince || currentProvince === "ไม่พบจังหวัด") {
-      setGeneralError("ไม่สามารถระบุจังหวัดได้");
+    // ใช้ finalProvince
+    const finalProvince = isManualMode
+      ? selectedProvince
+      : weatherData?.province;
+
+    if (!finalProvince || finalProvince === "ไม่พบจังหวัด") {
+      setGeneralError("กรุณาเลือกจังหวัด");
       setIsSubmitting(false);
       return;
     }
+
     if (!resizedImageFile) {
       setFileError("กรุณาอัปโหลดภาพ");
       setIsSubmitting(false);
@@ -182,9 +198,8 @@ export const useHome = () => {
     }
 
     startProgress();
-
     predictMutation.mutate(
-      { province: currentProvince, imageFile: resizedImageFile },
+      { province: finalProvince, imageFile: resizedImageFile },
       {
         onSuccess: (data) => {
           setUploadProgress(1);
@@ -205,33 +220,39 @@ export const useHome = () => {
     );
   };
 
+  // === คำนวณ finalProvince สำหรับ UI ===
+  const finalProvince = isManualMode ? selectedProvince : weatherData?.province;
+
   return {
     // state
     imageFile,
     result,
     fileError,
     generalError,
-    isLoading: isLoading || weatherLoading || isGettingLocation,
+    isLoading: isLoading && !isManualMode,
     uploadProgress,
     isSubmitting: isSubmitting || predictMutation.isPending,
     currentProvince,
     isGettingLocation,
     locationPermissionDenied,
     preFetchedWeather,
-    provinces, // จาก useProvincesQuery
-
+    provinces,
+    // เพิ่มคืน
+    isManualMode,
+    selectedProvince,
+    setSelectedProvince,
+    setIsManualMode,
+    finalProvince,
     // refs
     cameraInputRef,
     galleryInputRef,
-
     // actions
     handleFileChange,
     onCameraPressed,
     onGalleryPressed,
     submit,
     getCurrentLocation,
-
-    // สำหรับ UI แสดง loading/error ของ weather
+    // สำหรับ UI
     weatherLoading,
     weatherError: !!weatherError,
   };

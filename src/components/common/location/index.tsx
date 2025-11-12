@@ -7,6 +7,7 @@ import RainfallSvg from "../../../../public/assets/svg/rainfall";
 const LocationWidget = (props: LocationWidgetProps) => {
   const { province, isLoading, errorText, temperature, humidity, rainfall } =
     props;
+
   return (
     <div
       style={{
@@ -25,7 +26,9 @@ const LocationWidget = (props: LocationWidgetProps) => {
           ตำแหน่งปัจจุบัน
         </span>
       </div>
+
       <div style={{ height: "12px" }} />
+
       {isLoading ? (
         <div style={{ display: "flex", alignItems: "center" }}>
           <div
@@ -47,14 +50,9 @@ const LocationWidget = (props: LocationWidgetProps) => {
             จังหวัด: {province}
           </span>
           <div style={{ height: "8px" }} />
-          {temperature && humidity && rainfall && (
+          {temperature && humidity && rainfall ? (
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
+              <div style={{ display: "flex", alignItems: "center" }}>
                 <span style={{ fontSize: "24px", color: "#F44336" }}>
                   <TemperatureSvg color="red" />
                 </span>
@@ -82,22 +80,35 @@ const LocationWidget = (props: LocationWidgetProps) => {
                 </span>
               </div>
             </div>
+          ) : (
+            <span style={{ color: "#999", fontSize: "14px" }}>
+              กำลังดึงข้อมูลสภาพอากาศ...
+            </span>
           )}
         </div>
       ) : (
-        <span>ไม่สามารถระบุจังหวัดได้</span>
+        /* ไม่มีจังหวัด → แสดงข้อความชัดเจน */
+        <span style={{ color: "#999", fontSize: "14px" }}>
+          {errorText || "กรุณาเลือกจังหวัดด้านล่าง"}
+        </span>
       )}
-      {errorText && (
+
+      {errorText && !province && !isLoading && (
         <div style={{ paddingTop: "8px" }}>
           <span style={{ color: "#FF0000", fontSize: "14px" }}>
             {errorText}
           </span>
         </div>
       )}
+
       <style>{`
         @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
     </div>
