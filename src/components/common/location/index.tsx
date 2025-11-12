@@ -1,0 +1,105 @@
+import React from "react";
+
+interface LocationWidgetProps {
+  province?: string;
+  isLoading: boolean;
+  errorText?: string;
+  temperature?: string;
+  humidity?: string;
+  rainfall?: string;
+}
+
+const LocationWidget: React.FC<LocationWidgetProps> = ({
+  province,
+  isLoading,
+  errorText,
+  temperature,
+  humidity,
+  rainfall,
+}) => {
+  return (
+    <div
+      style={{
+        boxShadow: "0 6px 12px rgba(0,0,0,0.2)",
+        borderRadius: "20px",
+        padding: "20px",
+        backgroundColor: "#FFFFFF",
+        width: "100%",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <span style={{ fontSize: "24px", color: "#4CAF50" }}>📍</span>
+        <div style={{ width: "8px" }} />
+        <span style={{ fontSize: "16px", fontWeight: "bold" }}>
+          ตำแหน่งปัจจุบัน
+        </span>
+      </div>
+      <div style={{ height: "12px" }} />
+      {isLoading ? (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              border: "2px solid #f3f3f3",
+              borderTop: "2px solid #3498db",
+              borderRadius: "50%",
+              width: "16px",
+              height: "16px",
+              animation: "spin 1s linear infinite",
+            }}
+          />
+          <div style={{ width: "8px" }} />
+          <span>กำลังค้นหาตำแหน่ง...</span>
+        </div>
+      ) : province ? (
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <span style={{ fontSize: "18px", fontWeight: 500 }}>
+            จังหวัด: {province}
+          </span>
+          <div style={{ height: "8px" }} />
+          {temperature && humidity && rainfall && (
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <span style={{ fontSize: "24px", color: "#F44336" }}>🌡️</span>
+                <div style={{ width: "8px" }} />
+                <span style={{ fontSize: "16px" }}>
+                  อุณหภูมิ: {temperature} °C
+                </span>
+              </div>
+              <div style={{ height: "4px" }} />
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <span style={{ fontSize: "24px", color: "#2196F3" }}>💧</span>
+                <div style={{ width: "8px" }} />
+                <span style={{ fontSize: "16px" }}>ความชื้น: {humidity} %</span>
+              </div>
+              <div style={{ height: "4px" }} />
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <span style={{ fontSize: "24px", color: "#3F51B5" }}>☁️</span>
+                <div style={{ width: "8px" }} />
+                <span style={{ fontSize: "16px" }}>
+                  ปริมาณฝน: {rainfall} mm
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <span>ไม่สามารถระบุจังหวัดได้</span>
+      )}
+      {errorText && (
+        <div style={{ paddingTop: "8px" }}>
+          <span style={{ color: "#FF0000", fontSize: "14px" }}>
+            {errorText}
+          </span>
+        </div>
+      )}
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default LocationWidget;
