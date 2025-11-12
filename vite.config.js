@@ -10,6 +10,6 @@ export default defineConfig({
   preview: {
     host: true, // อนุญาตทุก host
     port: parseInt(process.env.PORT || '4173'),
-    allowedHosts: ['caneapi.onrender.com'] // เพิ่ม host ของคุณที่ Render
+    allowedHosts: ['caneapi.onrender.com']
   },
 })
