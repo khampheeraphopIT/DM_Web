@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef } from "react";
 import { ApiService } from "../services/apiServices";
@@ -116,7 +117,7 @@ const useHome = () => {
     }
   };
 
-  const pickImage = async (fromCamera: boolean, file: File) => {
+  const pickImage = async (_fromCamera: boolean, file: File) => {
     try {
       const files = await ImageService.preprocessImage(file);
       setOriginalImageFile(files.original);
