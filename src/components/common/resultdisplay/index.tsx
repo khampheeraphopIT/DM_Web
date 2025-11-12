@@ -41,7 +41,6 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
         borderRadius: "12px",
         backgroundColor: "#FFFFFF",
         padding: "16px",
-        width: "100%",
       }}
     >
       <span style={{ fontSize: "20px", fontWeight: "bold" }}>
@@ -54,7 +53,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
         </span>
       ) : (
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <span style={{ fontSize: "16px", fontWeight: "bold" }}>
+          <span style={{ fontSize: "16px", fontWeight: "500" }}>
             ผลการตรวจ: {diseaseName}
           </span>
           {description && (
@@ -64,14 +63,16 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
               </span>
             </div>
           )}
-          {result.confidence && (
-            <span>ระดับความมั่นใจของโมเดล: {result.confidence}</span>
-          )}
-          {result.riskLevel && (
-            <span>ระดับความเสี่ยงในการเกิดโรค: {result.riskLevel}</span>
-          )}
-          {result.province && <span>จังหวัด: {result.province}</span>}
-          <span>เวลาที่ตรวจ: {dateTimeTH(result.timestamp)}</span>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {result.confidence && (
+              <span>ระดับความมั่นใจของโมเดล: {result.confidence}</span>
+            )}
+            {result.riskLevel && (
+              <span>ระดับความเสี่ยงในการเกิดโรค: {result.riskLevel}</span>
+            )}
+            {result.province && <span>จังหวัด: {result.province}</span>}
+            <span>เวลาที่ตรวจ: {dateTimeTH(result.timestamp)}</span>
+          </div>
         </div>
       )}
     </div>

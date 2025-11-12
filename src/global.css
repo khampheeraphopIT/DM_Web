@@ -1,15 +1,61 @@
+/* โหลด Google Font ตัวอย่าง Roboto */
+@font-face {
+  font-family: 'Roboto';
+  src: url('/fonts/Roboto/Roboto-Regular.woff2') format('woff2'),
+       url('/fonts/Roboto/Roboto-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Bold 700 */
+@font-face {
+  font-family: 'Roboto';
+  src: url('/fonts/Roboto/Roboto-Bold.woff2') format('woff2'),
+       url('/fonts/Roboto/Roboto-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Italic 400 */
+@font-face {
+  font-family: 'Roboto';
+  src: url('/fonts/Roboto/Roboto-Italic.woff2') format('woff2'),
+       url('/fonts/Roboto/Roboto-Italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Bold Italic 700 */
+@font-face {
+  font-family: 'Roboto';
+  src: url('/fonts/Roboto/Roboto-BoldItalic.woff2') format('woff2'),
+       url('/fonts/Roboto/Roboto-BoldItalic.woff') format('woff');
+  font-weight: 700;
+  font-style: italic;
+}
+
+/* ตั้งค่า font ทั่วทั้งเว็บ */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
 }
 
+/* ให้ทุก element ใช้ font เดียวกัน */
+* {
+  font-family: inherit;
+  box-sizing: border-box; /* ช่วยให้ layout คำนวณ padding/margin ง่ายขึ้น */
+}
+
+/* root container */
 #root {
   height: 100%;
   width: 100%;
 }
 
+/* animation spinner */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

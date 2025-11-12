@@ -1,5 +1,5 @@
 export const ApiConstants = {
-  baseUrl: "https://can-api.hxck.ing",
+  baseUrl: "https://sugarcaneapi.krunnopparat.com",
   provincesUrl: "provinces",
   predictUrl: "predict",
 };
