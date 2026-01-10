@@ -1,5 +1,5 @@
 export const ApiConstants = {
-  baseUrl: "https://sugarcaneapi.krunnopparat.com",
+  baseUrl: "http://localhost:8000",
   provincesUrl: "provinces",
   predictUrl: "predict",
 };
