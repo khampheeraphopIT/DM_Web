@@ -1,75 +1,235 @@
-# React + TypeScript + Vite
+# 🌿 CaneScan Web - ระบบวินิจฉัยโรคใบอ้อยด้วย AI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<p align="center">
+  <img src="https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite-7-purple?style=for-the-badge&logo=vite" alt="Vite" />
+  <img src="https://img.shields.io/badge/License-MIT-orange?style=for-the-badge" alt="License" />
+</p>
 
-Currently, two official plugins are available:
+**Frontend เว็บแอปสำหรับวินิจฉัยโรคใบอ้อยด้วย AI** - ถ่ายภาพหรืออัพโหลดรูปใบอ้อย แล้วรับผลวินิจฉัยทันที!
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- 📷 **ถ่ายภาพ/อัพโหลด** - รองรับ Camera และ File Upload
+- 🤖 **AI วิเคราะห์ทันที** - ผลลัพธ์ภายในไม่กี่วินาที
+- 📊 **ผลวินิจฉัยละเอียด** - ความมั่นใจ, อาการ, วิธีรักษา
+- 📱 **Responsive Design** - ใช้งานได้ทั้ง Mobile และ Desktop
+- 🔐 **ระบบ Login** - บันทึกประวัติการสแกน
+- 📜 **ประวัติการสแกน** - ดูผลลัพธ์ย้อนหลัง
 
-Note: This will impact Vite dev & build performances.
+---
 
-## Expanding the ESLint configuration
+## 🖼️ Screenshots
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| หน้าหลัก | สแกนโรค | ผลวินิจฉัย |
+|----------|---------|------------|
+| Hero Section | Camera/Upload | Disease Results |
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🚀 Quick Start
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Prerequisites
+
+- Node.js 18+ หรือ Bun
+- Backend API running ([CaneScanDM_BE](https://github.com/yourusername/CaneScanDM_BE))
+
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/DM_Web.git
+cd DM_Web
+
+# ติดตั้ง dependencies
+npm install
+# หรือ
+bun install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Configuration
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+แก้ไข API URL ใน `src/services/api.ts`:
+```typescript
+const API_BASE = "http://localhost:8000/api";
 ```
+
+### Run Development Server
+
+```bash
+npm run dev
+# หรือ
+bun dev
+```
+
+🎉 เปิด http://localhost:5173
+
+---
+
+## 📁 Project Structure
+
+```
+DM_Web/
+├── src/
+│   ├── components/
+│   │   ├── HomePage/           # หน้าหลัก components
+│   │   │   ├── Header.tsx
+│   │   │   ├── HeroSection.tsx
+│   │   │   ├── Scanner.tsx
+│   │   │   ├── ResultDisplay.tsx
+│   │   │   ├── FeatureCard.tsx
+│   │   │   └── index.tsx
+│   │   ├── icons/              # SVG Icons
+│   │   │   ├── LeafIcon.tsx
+│   │   │   ├── CameraIcon.tsx
+│   │   │   └── index.tsx
+│   │   └── ui/                 # Reusable UI components
+│   │       ├── Button.tsx
+│   │       ├── Input.tsx
+│   │       └── Card.tsx
+│   ├── contexts/
+│   │   └── AuthContext.tsx     # Authentication state
+│   ├── hooks/
+│   │   └── useDisease.ts       # React Query hooks
+│   ├── pages/
+│   │   ├── HomePage.tsx
+│   │   ├── LoginPage.tsx
+│   │   └── HistoryPage.tsx
+│   ├── routes/
+│   │   └── index.tsx           # App routes
+│   ├── services/
+│   │   └── api.ts              # API calls
+│   ├── types/
+│   │   └── index.ts            # TypeScript interfaces
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+└── README.md
+```
+
+---
+
+## 🎨 Component Architecture
+
+```
+App
+└── AuthProvider
+    └── BrowserRouter
+        └── AppRoutes
+            ├── HomePage
+            │   ├── Header
+            │   ├── HeroSection
+            │   │   └── FeatureCard[]
+            │   ├── Scanner
+            │   └── ResultDisplay
+            ├── LoginPage
+            └── HistoryPage
+```
+
+---
+
+## 🔧 Tech Stack
+
+| Technology | Purpose |
+|------------|---------|
+| React 18 | UI Framework |
+| TypeScript 5 | Type Safety |
+| Vite 7 | Build Tool |
+| TanStack Query | Data Fetching |
+| React Router 6 | Routing |
+| Inline CSS | Styling |
+
+---
+
+## 📱 API Integration
+
+```typescript
+// src/services/api.ts
+const response = await apiService.predictDisease(imageFile);
+
+// Response Types
+interface ApiResponse {
+  success: boolean;
+  data?: PredictionResult;
+  error?: string;
+  error_type?: "rate_limit" | "quota_exceeded" | "unknown";
+  retry_after?: number;
+  message?: string;
+}
+```
+
+---
+
+## 🌐 Deployment
+
+### Vercel (Recommended)
+
+```bash
+npm install -g vercel
+vercel
+```
+
+### Netlify
+
+```bash
+npm run build
+# Upload dist/ folder to Netlify
+```
+
+### Docker
+
+```dockerfile
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+---
+
+## 📝 Environment Variables
+
+สร้างไฟล์ `.env.local` (optional):
+```env
+VITE_API_URL=http://localhost:8000/api
+```
+
+---
+
+## 🧪 Testing
+
+```bash
+npm run lint      # ESLint
+npm run build     # Type check + Build
+```
+
+---
+
+## 📝 License
+
+MIT License - ใช้งานได้อิสระ
+
+---
+
+## 👥 Contributors
+
+- Your Name (@yourusername)
+
+---
+
+<p align="center">
+  Made with 💚 for Thai Sugarcane Farmers
+</p>

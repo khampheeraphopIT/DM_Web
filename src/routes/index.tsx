@@ -1,14 +1,15 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "../pages/index.tsx";
-import NotFound from "../pages/notfound/index.tsx";
+import HomePage from "../pages/HomePage";
+import LoginPage from "../pages/LoginPage";
+import HistoryPage from "../pages/HistoryPage";
 
-function AppRoutes() {
+export const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="*" element={<NotFound />} />
+      {/* Public Routes */}
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/history" element={<HistoryPage />} />
     </Routes>
   );
-}
-
-export default AppRoutes;
+};
