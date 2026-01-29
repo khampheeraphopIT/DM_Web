@@ -1,6 +1,6 @@
 import type { ApiResponse } from "../types";
 
-const API_BASE = "https://canescandm-be.onrender.com/api";
+const API_BASE = "https://canescandm-be.onrender.com";
 
 export const apiService = {
   async predictDisease(imageFile: File): Promise<ApiResponse> {
