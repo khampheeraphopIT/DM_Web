@@ -4,11 +4,13 @@ import type { RateLimitInfo } from "../../types";
 interface RateLimitCardProps {
   rateLimitInfo?: RateLimitInfo | null;
   retryAfter?: number;
+  onCountdownEnd?: () => void;
 }
 
 export const RateLimitCard: React.FC<RateLimitCardProps> = ({
   rateLimitInfo,
   retryAfter,
+  onCountdownEnd,
 }) => {
   const [countdown, setCountdown] = useState(0);
 
@@ -32,20 +34,23 @@ export const RateLimitCard: React.FC<RateLimitCardProps> = ({
 
     // Otherwise no countdown needed
     setCountdown(0);
-  }, [
-    retryAfter,
-    rateLimitInfo?.can_request,
-    rateLimitInfo?.next_available_in,
-  ]);
+  }, [retryAfter, rateLimitInfo]);
 
   // Countdown timer
   useEffect(() => {
     if (countdown <= 0) return;
     const timer = setInterval(() => {
-      setCountdown((prev) => Math.max(0, prev - 1));
+      setCountdown((prev) => {
+        const next = Math.max(0, prev - 1);
+        // When countdown reaches 0, call the callback
+        if (next === 0 && prev > 0 && onCountdownEnd) {
+          setTimeout(onCountdownEnd, 100);
+        }
+        return next;
+      });
     }, 1000);
     return () => clearInterval(timer);
-  }, [countdown]);
+  }, [countdown, onCountdownEnd]);
 
   if (!rateLimitInfo) return null;
 

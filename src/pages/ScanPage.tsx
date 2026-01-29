@@ -17,11 +17,21 @@ const ScanPage: React.FC = () => {
   const [retryAfter, setRetryAfter] = useState<number>(0);
 
   const predictMutation = usePredictDisease();
-  const { data: initialRateLimit } = useGetRateLimit();
+  const { data: initialRateLimit, refetch: refetchRateLimit } =
+    useGetRateLimit();
   const isLoading = predictMutation.isPending;
 
   // Use latest rate limit info
   const currentRateLimit = rateLimitInfo || initialRateLimit;
+
+  // Called when countdown ends to refresh rate limit status
+  const handleCountdownEnd = async () => {
+    const result = await refetchRateLimit();
+    if (result.data) {
+      setRateLimitInfo(result.data);
+      setRetryAfter(0);
+    }
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -153,6 +163,7 @@ const ScanPage: React.FC = () => {
         <RateLimitCard
           rateLimitInfo={currentRateLimit}
           retryAfter={retryAfter}
+          onCountdownEnd={handleCountdownEnd}
         />
 
         {/* Error */}
@@ -282,35 +293,24 @@ const ScanPage: React.FC = () => {
             {imageFile && (
               <button
                 onClick={handleAnalyze}
-                disabled={isLoading || !currentRateLimit?.can_request}
+                disabled={isLoading}
                 style={{
                   width: "100%",
                   marginTop: "24px",
                   padding: "16px",
-                  backgroundColor:
-                    isLoading || !currentRateLimit?.can_request
-                      ? "#9CA3AF"
-                      : "#16A34A",
+                  backgroundColor: isLoading ? "#9CA3AF" : "#16A34A",
                   color: "#FFFFFF",
                   border: "none",
                   borderRadius: "10px",
                   fontSize: "16px",
                   fontWeight: "500",
-                  cursor:
-                    isLoading || !currentRateLimit?.can_request
-                      ? "not-allowed"
-                      : "pointer",
-                  boxShadow:
-                    isLoading || !currentRateLimit?.can_request
-                      ? "none"
-                      : "0 4px 14px rgba(22, 163, 74, 0.3)",
+                  cursor: isLoading ? "not-allowed" : "pointer",
+                  boxShadow: isLoading
+                    ? "none"
+                    : "0 4px 14px rgba(22, 163, 74, 0.3)",
                 }}
               >
-                {isLoading
-                  ? "กำลังวิเคราะห์..."
-                  : !currentRateLimit?.can_request
-                    ? "กรุณารอสักครู่..."
-                    : "เริ่มวิเคราะห์"}
+                {isLoading ? "กำลังวิเคราะห์..." : "เริ่มวิเคราะห์"}
               </button>
             )}
           </div>
