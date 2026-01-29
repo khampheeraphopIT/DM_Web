@@ -106,7 +106,7 @@ export const RateLimitCard: React.FC<RateLimitCardProps> = ({
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span style={{ fontSize: "18px" }}>📊</span>
           <span style={{ fontWeight: "600", color: "#374151" }}>
-            สถิติการใช้งานวันนี้ (Gemini Free Tier)
+            สถิติการใช้งานวันนี้
           </span>
         </div>
         <span
