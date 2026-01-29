@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { PredictionResult } from "../types";
-import { usePredictDisease } from "../hooks/useDisease";
+import type { PredictionResult, RateLimitInfo } from "../types";
+import { usePredictDisease, useGetRateLimit } from "../hooks/useDisease";
 import { AlertIcon, UploadIcon, LeafIcon } from "../components/icons";
-import { ResultCard } from "../components/scan";
+import { ResultCard, RateLimitCard } from "../components/scan";
 
 const ScanPage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,9 +11,17 @@ const ScanPage: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [result, setResult] = useState<PredictionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [rateLimitInfo, setRateLimitInfo] = useState<RateLimitInfo | null>(
+    null,
+  );
+  const [retryAfter, setRetryAfter] = useState<number>(0);
 
   const predictMutation = usePredictDisease();
+  const { data: initialRateLimit } = useGetRateLimit();
   const isLoading = predictMutation.isPending;
+
+  // Use latest rate limit info
+  const currentRateLimit = rateLimitInfo || initialRateLimit;
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -39,9 +47,19 @@ const ScanPage: React.FC = () => {
     setError(null);
     try {
       const response = await predictMutation.mutateAsync(imageFile);
+
+      // Update rate limit from response
+      if (response.rate_limit) {
+        setRateLimitInfo(response.rate_limit);
+      }
+
       if (response.success && response.data) {
         setResult(response.data);
       } else {
+        // Handle rate limit error
+        if (response.error_type === "rate_limit" && response.retry_after) {
+          setRetryAfter(response.retry_after);
+        }
         setError(
           response.message || response.error || "เกิดข้อผิดพลาดในการวิเคราะห์",
         );
@@ -56,6 +74,7 @@ const ScanPage: React.FC = () => {
     setImagePreview(null);
     setResult(null);
     setError(null);
+    setRetryAfter(0);
   };
 
   return (
@@ -129,6 +148,12 @@ const ScanPage: React.FC = () => {
             อัพโหลดรูปภาพใบอ้อยเพื่อตรวจสอบโรค
           </p>
         </div>
+
+        {/* Rate Limit Status */}
+        <RateLimitCard
+          rateLimitInfo={currentRateLimit}
+          retryAfter={retryAfter}
+        />
 
         {/* Error */}
         {error && (
@@ -257,24 +282,35 @@ const ScanPage: React.FC = () => {
             {imageFile && (
               <button
                 onClick={handleAnalyze}
-                disabled={isLoading}
+                disabled={isLoading || !currentRateLimit?.can_request}
                 style={{
                   width: "100%",
                   marginTop: "24px",
                   padding: "16px",
-                  backgroundColor: isLoading ? "#9CA3AF" : "#16A34A",
+                  backgroundColor:
+                    isLoading || !currentRateLimit?.can_request
+                      ? "#9CA3AF"
+                      : "#16A34A",
                   color: "#FFFFFF",
                   border: "none",
                   borderRadius: "10px",
                   fontSize: "16px",
                   fontWeight: "500",
-                  cursor: isLoading ? "not-allowed" : "pointer",
-                  boxShadow: isLoading
-                    ? "none"
-                    : "0 4px 14px rgba(22, 163, 74, 0.3)",
+                  cursor:
+                    isLoading || !currentRateLimit?.can_request
+                      ? "not-allowed"
+                      : "pointer",
+                  boxShadow:
+                    isLoading || !currentRateLimit?.can_request
+                      ? "none"
+                      : "0 4px 14px rgba(22, 163, 74, 0.3)",
                 }}
               >
-                {isLoading ? "กำลังวิเคราะห์..." : "เริ่มวิเคราะห์"}
+                {isLoading
+                  ? "กำลังวิเคราะห์..."
+                  : !currentRateLimit?.can_request
+                    ? "กรุณารอสักครู่..."
+                    : "เริ่มวิเคราะห์"}
               </button>
             )}
           </div>

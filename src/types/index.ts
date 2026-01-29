@@ -18,6 +18,17 @@ export interface PredictionResult {
   fun_fact?: string;
 }
 
+export interface RateLimitInfo {
+  requests_used_minute: number;
+  requests_used_day: number;
+  max_per_minute: number;
+  max_per_day: number;
+  remaining_minute: number;
+  remaining_day: number;
+  next_available_in: number;
+  can_request: boolean;
+}
+
 export interface ApiResponse {
   success: boolean;
   data?: PredictionResult;
@@ -25,11 +36,13 @@ export interface ApiResponse {
   error_type?:
     | "rate_limit"
     | "quota_exceeded"
+    | "server_overloaded"
     | "invalid_file"
     | "read_error"
     | "unknown";
   retry_after?: number;
   message?: string;
+  rate_limit?: RateLimitInfo;
 }
 
 export interface User {
