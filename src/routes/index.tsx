@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import HomePage from "../pages/HomePage";
+import ScanPage from "../pages/ScanPage";
 import LoginPage from "../pages/LoginPage";
 import HistoryPage from "../pages/HistoryPage";
 
@@ -8,6 +9,7 @@ export const AppRoutes = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<HomePage />} />
+      <Route path="/scan" element={<ScanPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/history" element={<HistoryPage />} />
     </Routes>

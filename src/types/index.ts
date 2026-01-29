@@ -1,15 +1,21 @@
 export interface PredictionResult {
   is_sugarcane: boolean;
-  disease: string;
-  disease_th: string;
+  disease?: string;
+  disease_th?: string;
   confidence: number;
-  symptoms: string[];
+  symptoms?: string[];
   analysis: string;
-  severity: "mild" | "moderate" | "severe" | "none";
+  severity?: "mild" | "moderate" | "severe" | "none";
   cause?: string;
   weather_related?: boolean;
-  treatment: string[];
+  treatment?: string[];
   prevention?: string[];
+  // For non-sugarcane
+  detected_object?: string;
+  detected_object_th?: string;
+  observations?: string[];
+  sugarcane_differences?: string[];
+  fun_fact?: string;
 }
 
 export interface ApiResponse {

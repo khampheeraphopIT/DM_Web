@@ -8,3 +8,4 @@ export { LeafIcon } from "./LeafIcon";
 export { UserIcon } from "./UserIcon";
 export { AlertIcon } from "./AlertIcon";
 export { SpinnerIcon } from "./SpinnerIcon";
+export { UploadIcon } from "./UploadIcon";
