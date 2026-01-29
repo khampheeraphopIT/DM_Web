@@ -7,6 +7,8 @@
     "types": ["node"],
     "skipLibCheck": true,
     "composite": true,
+    "emitDeclarationOnly": true,
+    "declaration": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
