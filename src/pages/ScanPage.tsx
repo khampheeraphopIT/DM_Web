@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import type { PredictionResult, RateLimitInfo } from "../types";
-import { usePredictDisease, useGetRateLimit } from "../hooks/useDisease";
+import type { PredictionResult } from "../types";
+import { usePredictDisease } from "../hooks/useDisease";
 import { AlertIcon, UploadIcon, LeafIcon } from "../components/icons";
-import { ResultCard, RateLimitCard } from "../components/scan";
+import { ResultCard } from "../components/scan";
 
 const ScanPage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,27 +11,21 @@ const ScanPage: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [result, setResult] = useState<PredictionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [rateLimitInfo, setRateLimitInfo] = useState<RateLimitInfo | null>(
-    null,
-  );
-  const [retryAfter, setRetryAfter] = useState<number>(0);
+  const [countdown, setCountdown] = useState<number>(0);
 
   const predictMutation = usePredictDisease();
-  const { data: initialRateLimit, refetch: refetchRateLimit } =
-    useGetRateLimit();
   const isLoading = predictMutation.isPending;
 
-  // Use latest rate limit info
-  const currentRateLimit = rateLimitInfo || initialRateLimit;
+  // Countdown timer logic
+  useEffect(() => {
+    if (countdown <= 0) return;
 
-  // Called when countdown ends to refresh rate limit status
-  const handleCountdownEnd = async () => {
-    const result = await refetchRateLimit();
-    if (result.data) {
-      setRateLimitInfo(result.data);
-      setRetryAfter(0);
-    }
-  };
+    const timer = setInterval(() => {
+      setCountdown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -39,6 +33,7 @@ const ScanPage: React.FC = () => {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
       setError(null);
+      setCountdown(0);
     }
   };
 
@@ -49,6 +44,7 @@ const ScanPage: React.FC = () => {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
       setError(null);
+      setCountdown(0);
     }
   };
 
@@ -58,21 +54,23 @@ const ScanPage: React.FC = () => {
     try {
       const response = await predictMutation.mutateAsync(imageFile);
 
-      // Update rate limit from response
-      if (response.rate_limit) {
-        setRateLimitInfo(response.rate_limit);
-      }
-
       if (response.success && response.data) {
         setResult(response.data);
       } else {
         // Handle rate limit error
         if (response.error_type === "rate_limit" && response.retry_after) {
-          setRetryAfter(response.retry_after);
+          setCountdown(response.retry_after);
+          setError(
+            response.message ||
+              `กรุณารอ ${response.retry_after} วินาที แล้วลองใหม่`,
+          );
+        } else {
+          setError(
+            response.message ||
+              response.error ||
+              "เกิดข้อผิดพลาดในการวิเคราะห์",
+          );
         }
-        setError(
-          response.message || response.error || "เกิดข้อผิดพลาดในการวิเคราะห์",
-        );
       }
     } catch {
       setError("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
@@ -84,7 +82,7 @@ const ScanPage: React.FC = () => {
     setImagePreview(null);
     setResult(null);
     setError(null);
-    setRetryAfter(0);
+    setCountdown(0);
   };
 
   return (
@@ -159,14 +157,7 @@ const ScanPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Rate Limit Status */}
-        <RateLimitCard
-          rateLimitInfo={currentRateLimit}
-          retryAfter={retryAfter}
-          onCountdownEnd={handleCountdownEnd}
-        />
-
-        {/* Error */}
+        {/* Error Alert with Countdown */}
         {error && (
           <div
             style={{
@@ -182,7 +173,11 @@ const ScanPage: React.FC = () => {
             }}
           >
             <AlertIcon size={18} color="#DC2626" />
-            <span style={{ fontSize: "14px" }}>{error}</span>
+            <span style={{ fontSize: "14px" }}>
+              {countdown > 0
+                ? `กรุณารออีก ${countdown} วินาที แล้วลองใหม่`
+                : error}
+            </span>
           </div>
         )}
 
@@ -293,24 +288,31 @@ const ScanPage: React.FC = () => {
             {imageFile && (
               <button
                 onClick={handleAnalyze}
-                disabled={isLoading}
+                disabled={isLoading || countdown > 0}
                 style={{
                   width: "100%",
                   marginTop: "24px",
                   padding: "16px",
-                  backgroundColor: isLoading ? "#9CA3AF" : "#16A34A",
+                  backgroundColor:
+                    isLoading || countdown > 0 ? "#9CA3AF" : "#16A34A",
                   color: "#FFFFFF",
                   border: "none",
                   borderRadius: "10px",
                   fontSize: "16px",
                   fontWeight: "500",
-                  cursor: isLoading ? "not-allowed" : "pointer",
-                  boxShadow: isLoading
-                    ? "none"
-                    : "0 4px 14px rgba(22, 163, 74, 0.3)",
+                  cursor:
+                    isLoading || countdown > 0 ? "not-allowed" : "pointer",
+                  boxShadow:
+                    isLoading || countdown > 0
+                      ? "none"
+                      : "0 4px 14px rgba(22, 163, 74, 0.3)",
                 }}
               >
-                {isLoading ? "กำลังวิเคราะห์..." : "เริ่มวิเคราะห์"}
+                {isLoading
+                  ? "กำลังวิเคราะห์..."
+                  : countdown > 0
+                    ? `กรุณารอ (${countdown}ว)`
+                    : "เริ่มวิเคราะห์"}
               </button>
             )}
           </div>
