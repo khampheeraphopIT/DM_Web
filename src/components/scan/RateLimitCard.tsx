@@ -48,7 +48,25 @@ export const RateLimitCard: React.FC<RateLimitCardProps> = ({
     return () => clearInterval(timer);
   }, [countdown, onCountdownEnd]);
 
-  if (!rateLimitInfo) return null;
+  if (!rateLimitInfo) {
+    return (
+      <div
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: "16px",
+          padding: "20px",
+          marginBottom: "24px",
+          border: "1px solid #E5E7EB",
+          opacity: 0.6,
+          textAlign: "center",
+          fontSize: "14px",
+          color: "#6B7280",
+        }}
+      >
+        กำลังโหลดข้อมูลการใช้งาน...
+      </div>
+    );
+  }
 
   const usedDaily = rateLimitInfo.requests_used_day;
   const maxDaily = rateLimitInfo.max_per_day;
@@ -59,6 +77,7 @@ export const RateLimitCard: React.FC<RateLimitCardProps> = ({
 
   // Format countdown into readable text
   const formatTime = (seconds: number) => {
+    if (seconds <= 0) return "0 วินาที";
     if (seconds < 60) return `${seconds} วินาที`;
     if (seconds < 3600) return `${Math.ceil(seconds / 60)} นาที`;
     const hours = Math.floor(seconds / 3600);
@@ -87,7 +106,7 @@ export const RateLimitCard: React.FC<RateLimitCardProps> = ({
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span style={{ fontSize: "18px" }}>📊</span>
           <span style={{ fontWeight: "600", color: "#374151" }}>
-            สถิติการใช้งานวันนี้
+            สถิติการใช้งานวันนี้ (Gemini Free Tier)
           </span>
         </div>
         <span
@@ -111,10 +130,16 @@ export const RateLimitCard: React.FC<RateLimitCardProps> = ({
           }}
         >
           <span style={{ color: "#6B7280" }}>
-            ใช้ไปแล้ว: {usedDaily}/{maxDaily} ครั้ง
+            ใช้ไปแล้ว:{" "}
+            <strong style={{ color: isDailyFull ? "#DC2626" : "#374151" }}>
+              {usedDaily}
+            </strong>{" "}
+            / {maxDaily} ครั้ง
           </span>
           <span style={{ color: "#6B7280" }}>
-            เหลือ {rateLimitInfo.remaining_day} ครั้ง
+            {isDailyFull
+              ? "เริ่มใหม่พรุ่งนี้"
+              : `เหลือ ${rateLimitInfo.remaining_day} ครั้ง`}
           </span>
         </div>
         <div
@@ -139,9 +164,19 @@ export const RateLimitCard: React.FC<RateLimitCardProps> = ({
             }}
           />
         </div>
+        <div
+          style={{
+            marginTop: "8px",
+            fontSize: "11px",
+            color: "#9CA3AF",
+            textAlign: "right",
+          }}
+        >
+          * โควต้ารีเซ็ตทุกวันเวลา 07:00 น. (ตามเวลาประเทศไทย)
+        </div>
       </div>
 
-      {countdown > 0 && (
+      {(countdown > 0 || isDailyFull) && (
         <div
           style={{
             backgroundColor: isDailyFull ? "#FFF1F2" : "#FFFBEB",
@@ -165,8 +200,8 @@ export const RateLimitCard: React.FC<RateLimitCardProps> = ({
             }}
           >
             {isDailyFull
-              ? `โควต้าเต็มแล้ว โปรดรอรีเซ็ตในอีก ${formatTime(countdown)}`
-              : `คุณใช้เร็วเกินไป โปรดรออีก ${countdown} วินาที`}
+              ? `โควต้าเต็มแล้ว โปรดลองใหม่ในอีก ${formatTime(countdown)}`
+              : `คุณขอใช้งานบ่อยเกินไป โปรดรออีก ${countdown} วินาที`}
           </span>
         </div>
       )}
