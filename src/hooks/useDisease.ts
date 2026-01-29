@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiService } from "../services/api";
-import type { ApiResponse } from "../types";
+import type { ApiResponse, RateLimitInfo } from "../types";
 
 /**
  * Hook สำหรับวิเคราะห์โรคใบอ้อย
@@ -21,5 +21,17 @@ export const useGetDiseases = () => {
     queryKey: ["diseases"],
     queryFn: () => apiService.getDiseases(),
     staleTime: 1000 * 60 * 60, // Cache 1 hour
+  });
+};
+
+/**
+ * Hook สำหรับดึงสถานะ rate limit
+ */
+export const useGetRateLimit = () => {
+  return useQuery<RateLimitInfo>({
+    queryKey: ["rateLimit"],
+    queryFn: () => apiService.getRateLimit(),
+    refetchInterval: 30000, // Refetch every 30 seconds (conservative)
+    staleTime: 10000,
   });
 };

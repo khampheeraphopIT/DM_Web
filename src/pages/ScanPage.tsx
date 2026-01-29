@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import type { PredictionResult } from "../types";
-import { usePredictDisease } from "../hooks/useDisease";
-import { AlertIcon, UploadIcon, LeafIcon } from "../components/icons";
-import { ResultCard } from "../components/scan";
+import type { PredictionResult, RateLimitInfo } from "../types";
+import { usePredictDisease, useGetRateLimit } from "../hooks/useDisease";
+import {
+  AlertIcon,
+  UploadIcon,
+  LeafIcon,
+  TrashIcon,
+} from "../components/icons";
+import { ResultCard, RateLimitCard } from "../components/scan";
 
 const ScanPage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,21 +16,32 @@ const ScanPage: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [result, setResult] = useState<PredictionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState<number>(0);
+  const [rateLimitInfo, setRateLimitInfo] = useState<RateLimitInfo | null>(
+    null,
+  );
+  const [retryAfter, setRetryAfter] = useState<number>(0);
 
   const predictMutation = usePredictDisease();
+  const { data: initialRateLimit, refetch: refetchRateLimit } =
+    useGetRateLimit();
+
   const isLoading = predictMutation.isPending;
+  const currentRateLimit = rateLimitInfo || initialRateLimit;
 
-  // Countdown timer logic
+  // Sync internal rate limit state when initial query loads
   useEffect(() => {
-    if (countdown <= 0) return;
+    if (initialRateLimit) {
+      setRateLimitInfo(initialRateLimit);
+    }
+  }, [initialRateLimit]);
 
-    const timer = setInterval(() => {
-      setCountdown((prev) => Math.max(0, prev - 1));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [countdown]);
+  const handleCountdownEnd = async () => {
+    const freshData = await refetchRateLimit();
+    if (freshData.data) {
+      setRateLimitInfo(freshData.data);
+      setRetryAfter(0);
+    }
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -33,7 +49,6 @@ const ScanPage: React.FC = () => {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
       setError(null);
-      setCountdown(0);
     }
   };
 
@@ -44,7 +59,6 @@ const ScanPage: React.FC = () => {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
       setError(null);
-      setCountdown(0);
     }
   };
 
@@ -54,23 +68,19 @@ const ScanPage: React.FC = () => {
     try {
       const response = await predictMutation.mutateAsync(imageFile);
 
+      if (response.rate_limit) {
+        setRateLimitInfo(response.rate_limit);
+      }
+
       if (response.success && response.data) {
         setResult(response.data);
       } else {
-        // Handle rate limit error
-        if (response.error_type === "rate_limit" && response.retry_after) {
-          setCountdown(response.retry_after);
-          setError(
-            response.message ||
-              `กรุณารอ ${response.retry_after} วินาที แล้วลองใหม่`,
-          );
-        } else {
-          setError(
-            response.message ||
-              response.error ||
-              "เกิดข้อผิดพลาดในการวิเคราะห์",
-          );
+        if (response.retry_after) {
+          setRetryAfter(response.retry_after);
         }
+        setError(
+          response.message || response.error || "เกิดข้อผิดพลาดในการวิเคราะห์",
+        );
       }
     } catch {
       setError("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
@@ -82,8 +92,11 @@ const ScanPage: React.FC = () => {
     setImagePreview(null);
     setResult(null);
     setError(null);
-    setCountdown(0);
+    setRetryAfter(0);
   };
+
+  const isButtonDisabled =
+    isLoading || (currentRateLimit && !currentRateLimit.can_request);
 
   return (
     <div
@@ -157,7 +170,14 @@ const ScanPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Error Alert with Countdown */}
+        {/* Rate Limit Status Card */}
+        <RateLimitCard
+          rateLimitInfo={currentRateLimit}
+          retryAfter={retryAfter}
+          onCountdownEnd={handleCountdownEnd}
+        />
+
+        {/* Error Alert */}
         {error && (
           <div
             style={{
@@ -173,11 +193,7 @@ const ScanPage: React.FC = () => {
             }}
           >
             <AlertIcon size={18} color="#DC2626" />
-            <span style={{ fontSize: "14px" }}>
-              {countdown > 0
-                ? `กรุณารออีก ${countdown} วินาที แล้วลองใหม่`
-                : error}
-            </span>
+            <span style={{ fontSize: "14px" }}>{error}</span>
           </div>
         )}
 
@@ -215,15 +231,22 @@ const ScanPage: React.FC = () => {
               }}
             >
               {imagePreview ? (
-                <div>
+                <div
+                  style={{
+                    position: "relative",
+                    display: "inline-block",
+                    maxWidth: "100%",
+                  }}
+                >
                   <img
                     src={imagePreview}
                     alt="Preview"
                     style={{
                       maxWidth: "100%",
-                      maxHeight: "300px",
+                      maxHeight: "400px",
                       borderRadius: "12px",
-                      marginBottom: "16px",
+                      display: "block",
+                      objectFit: "contain",
                     }}
                   />
                   <button
@@ -232,16 +255,33 @@ const ScanPage: React.FC = () => {
                       handleReset();
                     }}
                     style={{
-                      padding: "8px 16px",
-                      backgroundColor: "#FEF2F2",
+                      position: "absolute",
+                      top: "8px",
+                      right: "8px",
+                      width: "36px",
+                      height: "36px",
+                      backgroundColor: "rgba(254, 242, 242, 0.9)",
                       color: "#DC2626",
                       border: "none",
-                      borderRadius: "8px",
-                      fontSize: "14px",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       cursor: "pointer",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      transition: "all 0.2s ease",
+                      zIndex: 10,
                     }}
+                    onMouseOver={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#FEF2F2")
+                    }
+                    onMouseOut={(e) =>
+                      (e.currentTarget.style.backgroundColor =
+                        "rgba(254, 242, 242, 0.9)")
+                    }
+                    title="ลบรูปภาพ"
                   >
-                    ลบรูปภาพ
+                    <TrashIcon size={18} />
                   </button>
                 </div>
               ) : (
@@ -288,30 +328,27 @@ const ScanPage: React.FC = () => {
             {imageFile && (
               <button
                 onClick={handleAnalyze}
-                disabled={isLoading || countdown > 0}
+                disabled={isButtonDisabled}
                 style={{
                   width: "100%",
                   marginTop: "24px",
                   padding: "16px",
-                  backgroundColor:
-                    isLoading || countdown > 0 ? "#9CA3AF" : "#16A34A",
+                  backgroundColor: isButtonDisabled ? "#9CA3AF" : "#16A34A",
                   color: "#FFFFFF",
                   border: "none",
                   borderRadius: "10px",
                   fontSize: "16px",
                   fontWeight: "500",
-                  cursor:
-                    isLoading || countdown > 0 ? "not-allowed" : "pointer",
-                  boxShadow:
-                    isLoading || countdown > 0
-                      ? "none"
-                      : "0 4px 14px rgba(22, 163, 74, 0.3)",
+                  cursor: isButtonDisabled ? "not-allowed" : "pointer",
+                  boxShadow: isButtonDisabled
+                    ? "none"
+                    : "0 4px 14px rgba(22, 163, 74, 0.3)",
                 }}
               >
                 {isLoading
                   ? "กำลังวิเคราะห์..."
-                  : countdown > 0
-                    ? `กรุณารอ (${countdown}ว)`
+                  : currentRateLimit && !currentRateLimit.can_request
+                    ? "โปรดรอโควต้าคืนค่า..."
                     : "เริ่มวิเคราะห์"}
               </button>
             )}
