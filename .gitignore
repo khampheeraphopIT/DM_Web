@@ -34,3 +34,11 @@ coverage/
 # Misc
 .eslintcache
 *.local
+.npm
+.yarn
+.pnpm-store
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini

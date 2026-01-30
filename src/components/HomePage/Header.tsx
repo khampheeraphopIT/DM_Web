@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { LeafIcon, UserIcon, LogoutIcon } from "../icons";
+import { LeafIcon, UserIcon, LogoutIcon } from "../common/icons";
 
 interface HeaderProps {
   isAuthenticated: boolean;

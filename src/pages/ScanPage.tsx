@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import type { PredictionResult, RateLimitInfo } from "../types";
+import type { PredictionResult, RateLimitInfo } from "../utils/types";
 import { usePredictDisease, useGetRateLimit } from "../hooks/useDisease";
-import {
-  AlertIcon,
-  UploadIcon,
-  LeafIcon,
-  TrashIcon,
-} from "../components/icons";
+import { UploadIcon, LeafIcon, TrashIcon } from "../components/common/icons";
 import { ResultCard, RateLimitCard } from "../components/scan";
+import BackToHomeButton from "../components/common/BackToHomeButton";
+import ErrorAlert from "../components/common/ErrorAlert";
 
 const ScanPage: React.FC = () => {
   const navigate = useNavigate();
@@ -25,13 +22,43 @@ const ScanPage: React.FC = () => {
   const { data: initialRateLimit, refetch: refetchRateLimit } =
     useGetRateLimit();
 
+  // Load initial rate limit from localStorage if available to prevent 0/20 flicker
+  useEffect(() => {
+    const savedLimit = localStorage.getItem("canescan_rate_limit");
+    if (savedLimit) {
+      try {
+        const parsed = JSON.parse(savedLimit);
+        setRateLimitInfo(parsed);
+      } catch (e) {
+        console.error("Error loading saved rate limit", e);
+      }
+    }
+  }, []);
+
+  // Save to localStorage whenever rateLimitInfo updates
+  useEffect(() => {
+    if (rateLimitInfo) {
+      localStorage.setItem(
+        "canescan_rate_limit",
+        JSON.stringify(rateLimitInfo),
+      );
+    }
+  }, [rateLimitInfo]);
+
   const isLoading = predictMutation.isPending;
   const currentRateLimit = rateLimitInfo || initialRateLimit;
 
   // Sync internal rate limit state when initial query loads
   useEffect(() => {
     if (initialRateLimit) {
-      setRateLimitInfo(initialRateLimit);
+      // If we have saved info that is more restricted (higher usage), keep it
+      setRateLimitInfo((prev) => {
+        if (!prev) return initialRateLimit;
+        if (initialRateLimit.requests_used_day < prev.requests_used_day) {
+          return prev;
+        }
+        return initialRateLimit;
+      });
     }
   }, [initialRateLimit]);
 
@@ -133,20 +160,7 @@ const ScanPage: React.FC = () => {
             CaneScan
           </span>
         </div>
-        <button
-          onClick={() => navigate("/")}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "transparent",
-            border: "1px solid #D1D5DB",
-            borderRadius: "8px",
-            cursor: "pointer",
-            color: "#6B7280",
-            fontSize: "14px",
-          }}
-        >
-          กลับหน้าหลัก
-        </button>
+        <BackToHomeButton variant="outlined" showIcon={false} />
       </header>
 
       {/* Main */}
@@ -179,21 +193,8 @@ const ScanPage: React.FC = () => {
 
         {/* Error Alert */}
         {error && (
-          <div
-            style={{
-              padding: "12px 16px",
-              backgroundColor: "#FEF2F2",
-              border: "1px solid #FECACA",
-              borderRadius: "8px",
-              marginBottom: "24px",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              color: "#DC2626",
-            }}
-          >
-            <AlertIcon size={18} color="#DC2626" />
-            <span style={{ fontSize: "14px" }}>{error}</span>
+          <div style={{ marginBottom: "24px" }}>
+            <ErrorAlert message={error} />
           </div>
         )}
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { CameraIcon, SearchIcon, LeafIcon } from "../icons";
+import { CameraIcon, SearchIcon, LeafIcon } from "../common/icons";
 
 const features = [
   {

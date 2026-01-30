@@ -1,5 +1,5 @@
 import React from "react";
-import { CameraIcon } from "../icons";
+import { CameraIcon } from "../common/icons";
 
 interface HeroSectionProps {
   onStartScan: () => void;

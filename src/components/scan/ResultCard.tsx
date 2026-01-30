@@ -1,6 +1,6 @@
 import React from "react";
-import type { PredictionResult } from "../../types";
-import { LeafIcon, CameraIcon } from "../icons";
+import type { PredictionResult } from "../../utils/types";
+import { LeafIcon, CameraIcon } from "../common/icons";
 
 interface ResultCardProps {
   result: PredictionResult;

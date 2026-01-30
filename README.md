@@ -75,61 +75,26 @@ bun dev
 DM_Web/
 ├── src/
 │   ├── components/
-│   │   ├── HomePage/           # หน้าหลัก components
-│   │   │   ├── Header.tsx
-│   │   │   ├── HeroSection.tsx
-│   │   │   ├── Scanner.tsx
-│   │   │   ├── ResultDisplay.tsx
-│   │   │   ├── FeatureCard.tsx
-│   │   │   └── index.tsx
-│   │   ├── icons/              # SVG Icons
-│   │   │   ├── LeafIcon.tsx
-│   │   │   ├── CameraIcon.tsx
-│   │   │   └── index.tsx
-│   │   └── ui/                 # Reusable UI components
-│   │       ├── Button.tsx
-│   │       ├── Input.tsx
-│   │       └── Card.tsx
-│   ├── contexts/
-│   │   └── AuthContext.tsx     # Authentication state
+│   │   ├── common/             # Reusable UI (icons, buttons)
+│   │   │   └── icons/          # Centralized SVG icons
+│   │   ├── scan/               # Feature-specific components
+│   │   │   ├── ResultCard.tsx
+│   │   │   └── RateLimitCard.tsx
+│   │   └── ui/                 # Base Atomic UI components
 │   ├── hooks/
-│   │   └── useDisease.ts       # React Query hooks
+│   │   └── useDisease.ts       # Shared logic & queries
 │   ├── pages/
 │   │   ├── HomePage.tsx
-│   │   ├── LoginPage.tsx
+│   │   ├── ScanPage.tsx
 │   │   └── HistoryPage.tsx
-│   ├── routes/
-│   │   └── index.tsx           # App routes
 │   ├── services/
-│   │   └── api.ts              # API calls
-│   ├── types/
-│   │   └── index.ts            # TypeScript interfaces
+│   │   └── api.ts              # API layer using Fetch/Axios
+│   ├── utils/
+│   │   └── types/              # Centralized TypeScript types
 │   ├── App.tsx
-│   ├── main.tsx
-│   └── index.css
+│   └── main.tsx
 ├── package.json
-├── tsconfig.json
-├── vite.config.ts
 └── README.md
-```
-
----
-
-## 🎨 Component Architecture
-
-```
-App
-└── AuthProvider
-    └── BrowserRouter
-        └── AppRoutes
-            ├── HomePage
-            │   ├── Header
-            │   ├── HeroSection
-            │   │   └── FeatureCard[]
-            │   ├── Scanner
-            │   └── ResultDisplay
-            ├── LoginPage
-            └── HistoryPage
 ```
 
 ---
@@ -141,9 +106,9 @@ App
 | React 18 | UI Framework |
 | TypeScript 5 | Type Safety |
 | Vite 7 | Build Tool |
-| TanStack Query | Data Fetching |
-| React Router 6 | Routing |
-| Inline CSS | Styling |
+| TanStack Query | Data Fetching & Sync |
+| PostgreSQL | Persistence (via Backend API) |
+| Inline CSS | Dynamic & Premium Styling |
 
 ---
 

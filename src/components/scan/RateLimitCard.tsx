@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import type { RateLimitInfo } from "../../types";
+import type { RateLimitInfo } from "../../utils/types";
 
 interface RateLimitCardProps {
   rateLimitInfo?: RateLimitInfo | null;

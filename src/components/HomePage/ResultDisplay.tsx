@@ -1,6 +1,6 @@
 import React from "react";
-import type { PredictionResult } from "../../types";
-import { CameraIcon, AlertIcon } from "../icons";
+import type { PredictionResult } from "../../utils/types";
+import { CameraIcon, AlertIcon } from "../common/icons";
 
 interface ResultDisplayProps {
   result: PredictionResult;

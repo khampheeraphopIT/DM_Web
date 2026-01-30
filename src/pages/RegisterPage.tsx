@@ -4,38 +4,42 @@ import { useForm, Resolver } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from "../contexts/AuthContext";
 import { TextFieldHook } from "../components/form";
-import { loginSchema } from "../utils/validation/schemas";
+import { registerSchema } from "../utils/validation/schemas";
 import AuthFormLayout from "../components/layout/AuthFormLayout";
 import Button from "../components/common/Button";
 import ErrorAlert from "../components/common/ErrorAlert";
-import { LockIcon } from "../components/common/icons";
+import { UserIcon } from "../components/common/icons";
 
-interface LoginFormData {
+interface RegisterFormData {
   phone: string;
+  name: string;
   password: string;
+  confirmPassword: string;
 }
 
-const LoginPage: React.FC = () => {
+const RegisterPage: React.FC = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { control, handleSubmit } = useForm<LoginFormData>({
-    resolver: yupResolver(loginSchema) as Resolver<LoginFormData>,
+  const { control, handleSubmit } = useForm<RegisterFormData>({
+    resolver: yupResolver(registerSchema) as Resolver<RegisterFormData>,
     defaultValues: {
       phone: "",
+      name: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  const { login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: RegisterFormData) => {
     setError("");
     setIsLoading(true);
 
     try {
-      const result = await login(data.phone, data.password);
+      const result = await register(data.phone, data.name, data.password);
       if (result.success) {
         navigate("/", { replace: true });
       } else {
@@ -49,7 +53,10 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <AuthFormLayout title="CaneScan" subtitle="ระบบตรวจโรคใบอ้อยด้วย AI">
+    <AuthFormLayout
+      title="สมัครสมาชิก"
+      subtitle="สร้างบัญชีเพื่อบันทึกประวัติการสแกน"
+    >
       <form
         onSubmit={handleSubmit(onSubmit)}
         style={{
@@ -68,11 +75,27 @@ const LoginPage: React.FC = () => {
         />
 
         <TextFieldHook
+          name="name"
+          control={control}
+          label="ชื่อ"
+          type="text"
+          placeholder="กรอกชื่อของคุณ"
+        />
+
+        <TextFieldHook
           name="password"
           control={control}
           label="รหัสผ่าน"
           type="password"
           placeholder="กรอกรหัสผ่าน"
+        />
+
+        <TextFieldHook
+          name="confirmPassword"
+          control={control}
+          label="ยืนยันรหัสผ่าน"
+          type="password"
+          placeholder="กรอกรหัสผ่านอีกครั้ง"
         />
 
         <ErrorAlert message={error} />
@@ -83,26 +106,26 @@ const LoginPage: React.FC = () => {
           size="lg"
           fullWidth
           loading={isLoading}
-          icon={<LockIcon size={18} color="white" />}
+          icon={<UserIcon size={18} color="white" />}
           style={{ marginTop: "8px" }}
         >
-          เข้าสู่ระบบ
+          สมัครสมาชิก
         </Button>
       </form>
 
-      {/* Register Link */}
+      {/* Login Link */}
       <div style={{ marginTop: "24px", textAlign: "center" }}>
         <p style={{ fontSize: "14px", color: "#6B7280", margin: 0 }}>
-          ยังไม่มีบัญชี?{" "}
+          มีบัญชีอยู่แล้ว?{" "}
           <Link
-            to="/register"
+            to="/login"
             style={{
               color: "#16A34A",
               fontWeight: "bold",
               textDecoration: "none",
             }}
           >
-            สมัครสมาชิก
+            เข้าสู่ระบบ
           </Link>
         </p>
       </div>
@@ -110,4 +133,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

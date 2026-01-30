@@ -6,7 +6,7 @@ import {
   ImageIcon,
   SearchIcon,
   SpinnerIcon,
-} from "../icons";
+} from "../common/icons";
 
 interface ScannerProps {
   imagePreview: string | null;

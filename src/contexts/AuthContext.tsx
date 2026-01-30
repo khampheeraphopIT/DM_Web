@@ -6,17 +6,26 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
+import { apiService } from "../services/api";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  login: (phone: string, password: string) => Promise<boolean>;
+  login: (
+    phone: string,
+    password: string,
+  ) => Promise<{ success: boolean; message: string }>;
+  register: (
+    phone: string,
+    name: string,
+    password: string,
+  ) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   isLoading: boolean;
 }
 
 interface User {
-  id: string;
+  id: number;
   phone: string;
   name: string;
 }
@@ -32,44 +41,67 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     // Check stored auth on mount
-    const storedUser = localStorage.getItem("canescan_user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-        setIsAuthenticated(true);
-      } catch {
-        localStorage.removeItem("canescan_user");
+    const initAuth = async () => {
+      const token = localStorage.getItem("canescan_token");
+      if (token) {
+        const userData = await apiService.getMe();
+        if (userData) {
+          setUser(userData);
+          setIsAuthenticated(true);
+        } else {
+          // Token expired or invalid
+          localStorage.removeItem("canescan_token");
+        }
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+    initAuth();
   }, []);
 
-  const login = async (phone: string, password: string): Promise<boolean> => {
-    // Simple mock login - in production, call API
-    // For now, accept any phone with password "1234"
-    if (password === "1234" && phone.length >= 10) {
-      const mockUser: User = {
-        id: `user_${Date.now()}`,
-        phone,
-        name: `เกษตรกร ${phone.slice(-4)}`,
-      };
-      setUser(mockUser);
+  const login = async (
+    phone: string,
+    password: string,
+  ): Promise<{ success: boolean; message: string }> => {
+    const result = await apiService.login(phone, password);
+    if (result.success && result.token && result.user) {
+      localStorage.setItem("canescan_token", result.token);
+      setUser(result.user);
       setIsAuthenticated(true);
-      localStorage.setItem("canescan_user", JSON.stringify(mockUser));
-      return true;
+      return { success: true, message: result.message };
     }
-    return false;
+    return {
+      success: false,
+      message: result.message || "เข้าสู่ระบบไม่สำเร็จ",
+    };
+  };
+
+  const register = async (
+    phone: string,
+    name: string,
+    password: string,
+  ): Promise<{ success: boolean; message: string }> => {
+    const result = await apiService.register(phone, name, password);
+    if (result.success && result.token && result.user) {
+      localStorage.setItem("canescan_token", result.token);
+      setUser(result.user);
+      setIsAuthenticated(true);
+      return { success: true, message: result.message };
+    }
+    return {
+      success: false,
+      message: result.message || "สมัครสมาชิกไม่สำเร็จ",
+    };
   };
 
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem("canescan_user");
+    localStorage.removeItem("canescan_token");
   };
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, login, logout, isLoading }}
+      value={{ isAuthenticated, user, login, register, logout, isLoading }}
     >
       {children}
     </AuthContext.Provider>
