@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { LeafIcon, UserIcon, LogoutIcon } from "../common/icons";
+import Logo from "../common/Logo";
+import { UserIcon, LogoutIcon } from "../common/icons";
 
 interface HeaderProps {
   isAuthenticated: boolean;
@@ -29,32 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
         boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <LeafIcon size={32} color="#16A34A" />
-        </div>
-        <span
-          style={{
-            fontSize: "24px",
-            fontWeight: "bold",
-            color: "#166534",
-          }}
-        >
-          CaneScan
-        </span>
-      </div>
+      <Logo size={32} />
 
       <div
         style={{
