@@ -1,6 +1,7 @@
 import type { ApiResponse, RateLimitInfo } from "../utils/types";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_BASE =
+  import.meta.env.VITE_API_URL || "https://canescandm-be.onrender.com";
 
 // ============ Auth Types ============
 export interface AuthResponse {
