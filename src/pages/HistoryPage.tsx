@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  LeafIcon,
-  CameraIcon,
-  LockIcon,
-  DatabaseIcon,
-} from "../components/common/icons";
+import { CameraIcon, LockIcon, DatabaseIcon } from "../components/common/icons";
+import Logo from "../components/common/Logo";
 import { useGetHistory } from "../hooks/useDisease";
 import { useAuth } from "../contexts/AuthContext";
 import HistoryCard from "../components/history/HistoryCard";
@@ -56,7 +52,7 @@ const HistoryPage: React.FC = () => {
         }}
       >
         <EmptyState
-          icon={<LeafIcon size={80} color="#D1D5DB" />}
+          icon={<Logo size={80} showText={false} style={{ opacity: 0.2 }} />}
           title="กรุณาเข้าสู่ระบบ"
           description="เข้าสู่ระบบเพื่อดูประวัติการสแกนของคุณ"
           action={

@@ -1,7 +1,15 @@
-import React from "react";
-import { CameraIcon, SearchIcon, LeafIcon } from "../common/icons";
+import Logo from "../common/Logo";
+import { CameraIcon, SearchIcon } from "../common/icons";
 
-const features = [
+interface Feature {
+  icon: React.FC<{ size?: number; color?: string }>;
+  iconBg: string;
+  iconColor: string;
+  title: string;
+  description: string;
+}
+
+const features: Feature[] = [
   {
     icon: CameraIcon,
     iconBg: "#F0FDF4",
@@ -17,7 +25,7 @@ const features = [
     description: "ใช้ AI วิเคราะห์ภาพ ตรวจจับโรคได้หลากหลายชนิด",
   },
   {
-    icon: LeafIcon,
+    icon: ({ size }) => <Logo size={size} showText={false} />,
     iconBg: "#FEF3C7",
     iconColor: "#D97706",
     title: "ครบถ้วน",

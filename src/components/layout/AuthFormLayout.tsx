@@ -1,5 +1,5 @@
 import React from "react";
-import { LeafIcon } from "../common/icons";
+import Logo from "../common/Logo";
 import BackToHomeButton from "../common/BackToHomeButton";
 
 interface AuthFormLayoutProps {
@@ -41,17 +41,14 @@ const AuthFormLayout: React.FC<AuthFormLayoutProps> = ({
             marginBottom: "32px",
           }}
         >
-          <div
-            style={{
-              display: "inline-flex",
-              marginBottom: "12px",
-            }}
-          >
-            <LeafIcon size={56} color="#16A34A" />
-          </div>
+          <Logo
+            size={48}
+            showText={false}
+            style={{ justifyContent: "center", marginBottom: "16px" }}
+          />
           <h1
             style={{
-              fontSize: "32px",
+              fontSize: "28px",
               fontWeight: "bold",
               color: "#166534",
               margin: "0 0 4px 0",
@@ -64,7 +61,8 @@ const AuthFormLayout: React.FC<AuthFormLayoutProps> = ({
               style={{
                 fontSize: "14px",
                 color: "#6B7280",
-                margin: 0,
+                marginTop: "8px",
+                marginBottom: 0,
               }}
             >
               {subtitle}

@@ -4,7 +4,6 @@ export { CameraIcon } from "./CameraIcon";
 export { ImageIcon } from "./ImageIcon";
 export { LogoutIcon } from "./LogoutIcon";
 export { SearchIcon } from "./SearchIcon";
-export { LeafIcon } from "./LeafIcon";
 export { UserIcon } from "./UserIcon";
 export { AlertIcon } from "./AlertIcon";
 export { SpinnerIcon } from "./SpinnerIcon";

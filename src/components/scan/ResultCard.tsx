@@ -1,6 +1,7 @@
 import React from "react";
 import type { PredictionResult } from "../../utils/types";
-import { LeafIcon, CameraIcon } from "../common/icons";
+import { CameraIcon } from "../common/icons";
+import Logo from "../common/Logo";
 
 interface ResultCardProps {
   result: PredictionResult;
@@ -64,7 +65,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({
             }}
           >
             {result.is_sugarcane ? (
-              <LeafIcon size={20} color="#16A34A" />
+              <Logo size={20} showText={false} />
             ) : (
               <CameraIcon size={20} color="#4F46E5" />
             )}

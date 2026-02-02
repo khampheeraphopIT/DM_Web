@@ -1,5 +1,4 @@
-import React from "react";
-import { LeafIcon } from "./icons";
+import Logo from "./Logo";
 import BackToHomeButton from "./BackToHomeButton";
 
 interface PageHeaderProps {
@@ -42,7 +41,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           justifyContent: "center",
         }}
       >
-        <LeafIcon size={28} color="#16A34A" />
+        <Logo size={28} showText={false} />
         <h1
           style={{
             fontSize: "20px",

@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import type { PredictionResult, RateLimitInfo } from "../utils/types";
 import { usePredictDisease, useGetRateLimit } from "../hooks/useDisease";
-import { UploadIcon, LeafIcon, TrashIcon } from "../components/common/icons";
+import { UploadIcon, TrashIcon } from "../components/common/icons";
+import Logo from "../components/common/Logo";
 import { ResultCard, RateLimitCard } from "../components/scan";
 import BackToHomeButton from "../components/common/BackToHomeButton";
 import ErrorAlert from "../components/common/ErrorAlert";
 
 const ScanPage: React.FC = () => {
-  const navigate = useNavigate();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [result, setResult] = useState<PredictionResult | null>(null);
@@ -144,22 +143,7 @@ const ScanPage: React.FC = () => {
           justifyContent: "space-between",
         }}
       >
-        <div
-          onClick={() => navigate("/")}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            cursor: "pointer",
-          }}
-        >
-          <LeafIcon size={28} color="#16A34A" />
-          <span
-            style={{ fontSize: "20px", fontWeight: "600", color: "#1F2937" }}
-          >
-            CaneScan
-          </span>
-        </div>
+        <Logo size={32} />
         <BackToHomeButton variant="outlined" showIcon={false} />
       </header>
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Logo from "../common/Logo";
 import { AvatarMenu } from "../common/AvatarMenu";
 import { MenuIcon, CloseIcon, HistoryIcon, LogoutIcon } from "../common/icons";
 import { useAuth } from "../../contexts/AuthContext";
@@ -59,34 +60,7 @@ export const Header: React.FC = () => {
         }}
       >
         {/* Logo */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            cursor: "pointer",
-          }}
-          onClick={() => navigate("/")}
-        >
-          <img
-            src="/logo.png"
-            alt="CaneScan Logo"
-            style={{
-              width: isMobile ? "32px" : "36px",
-              height: isMobile ? "32px" : "36px",
-              borderRadius: "8px",
-            }}
-          />
-          <span
-            style={{
-              fontSize: isMobile ? "18px" : "20px",
-              fontWeight: "700",
-              color: "#166534",
-            }}
-          >
-            CaneScan
-          </span>
-        </div>
+        <Logo size={isMobile ? 32 : 36} />
 
         {/* Desktop Navigation */}
         {!isMobile && (
