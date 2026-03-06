@@ -6,12 +6,16 @@
     "module": "ESNext",
     "types": ["node"],
     "skipLibCheck": true,
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "declaration": true,
 
     "moduleResolution": "bundler",
     // "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
 
+<<<<<<< HEAD
     "noEmit": false,          // เปลี่ยนเป็น false
     "composite": true,        // เพิ่มบรรทัดนี้
 
@@ -21,6 +25,13 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
+=======
+    /* Linting */
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": false
+>>>>>>> dev-phop
   },
   "include": ["vite.config.ts"]
 }
